@@ -81,6 +81,8 @@ python -m http.server 8000
 2. Settings → Pages → Source 选 `Deploy from a branch`，Branch 选 `main` / `root`，保存。
 3. 等半分钟，访问 `https://<你的用户名>.github.io/<仓库名>/`。
 
+> 本仓库已部署，在线地址：**https://xiaobaigyt.github.io/aimei-checklist/**
+
 单文件应用不需要任何构建步骤，改完 `index.html` 直接提交就生效。
 
 ---
