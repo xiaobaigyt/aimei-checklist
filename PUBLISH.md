@@ -75,6 +75,33 @@ gh repo create <REPO> --public --source=. --remote=origin --push
 
 ---
 
+## 本机环境诊断（2026-11-10，重要）
+
+试过装 GitHub CLI 走一条龙，**卡住了**，原因不在项目，在网络：
+
+- 系统记着一个代理 `127.0.0.1:7897`（WinINET 设置），但**代理软件当时没开**，端口没监听。
+- 结果：`api.github.com` 偶尔可达，`github.com` 超时；winget 要从 GitHub 下载 release，直接卡死在下载阶段，`gh.exe` 没落盘。
+- git 自身**没有**配代理（`git config --global http.proxy` 为空），所以 `git push` 会走直连，在国内网络下大概率失败。
+
+**推送前先做两件事：**
+
+1. 打开你的代理软件（让 `127.0.0.1:7897` 真正监听起来）。
+2. 给 git 配上代理（端口按你软件实际设置改）：
+
+```powershell
+git config --global http.proxy  http://127.0.0.1:7897
+git config --global https.proxy http://127.0.0.1:7897
+# 不用了就取消：
+# git config --global --unset http.proxy
+# git config --global --unset https.proxy
+```
+
+配好后重新 `git push -u origin main`。如果代理软件提供的是 SOCKS5，把 `http://` 换成 `socks5://`。
+
+> 注：`winget install GitHub.cli` 在代理恢复后可以重试；但**其实不装 gh 也能推**，走上面的「路径 A」即可，更省事。
+
+---
+
 ## 关于商用授权
 
 README 里写了：题目是 **CC BY-NC-SA**，别人可以转载、改编、做非商业版本，但接广告、卖课、付费小程序需要先开 issue 授权。你自己当然不受这个限制——你是著作权人，可以任意处置。
