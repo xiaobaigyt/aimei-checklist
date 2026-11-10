@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="description" content="40 个场景，测你和 TA 之间那段还没名字的关系。单文件、零依赖、可离线运行。" />
+<meta name="author" content="听风" />
+<meta property="og:title" content="这算暧昧吗？判定表" />
+<meta property="og:description" content="还没在一起，但已经不像朋友——40 题测你的边界。" />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%238e6bb8'/%3E%3Ctext x='16' y='23' font-size='18' text-anchor='middle' fill='white' font-family='sans-serif'%3E%E6%9A%A7%3C/text%3E%3C/svg%3E" />
+
+<title>这算暧昧吗？判定表</title>
+<style>
+  :root{
+    --pink:#8e6bb8;
+    --pink-deep:#6b3f96;
+    --pink-soft:#ede4f7;
+    --ink:#211c29;
+    --muted:#7d728a;
+    --line:#e8e0f3;
+    --c1:#c2557a;
+    --c2:#cf8b3c;
+    --c3:#4d8a74;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1100px 560px at 8% -12%, #ecdef8 0%, rgba(236,222,248,0) 62%),
+      radial-gradient(900px 500px at 104% -4%, #f2ebfa 0%, rgba(242,235,250,0) 58%),
+      linear-gradient(180deg,#fcfafe 0%,#f2ecf8 100%);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:22px 14px 56px;
+  }
+  .app{width:100%;max-width:640px}
+  .screen{display:none;animation:fade .28s ease}
+  .screen.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- 封面 ---------- */
+  .intro-card{
+    background:var(--card);
+    border-radius:26px;
+    padding:34px 26px 26px;
+    box-shadow:0 18px 48px -18px rgba(107,63,150,.32), 0 2px 0 rgba(255,255,255,.8) inset;
+    border:1px solid #ebe0f6;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .intro-card::before{
+    content:"";position:absolute;inset:-60px -60px auto auto;width:220px;height:220px;
+    background:radial-gradient(circle,#e5d5f4,transparent 68%);opacity:.85;
+  }
+  .kicker{
+    display:inline-block;
+    font-size:12px;letter-spacing:.18em;font-weight:700;
+    color:var(--pink-deep);
+    background:var(--pink-soft);
+    padding:6px 12px;border-radius:999px;
+    position:relative;
+  }
+  h1.title{
+    font-size:clamp(34px,10vw,52px);
+    line-height:1.08;
+    margin:18px 0 4px;
+    letter-spacing:-.02em;
+    font-weight:900;
+    color:var(--pink);
+    text-shadow:0 2px 0 #fff, 0 6px 18px rgba(142,107,184,.24);
+    position:relative;
+  }
+  .title-sub{
+    font-size:clamp(20px,5.4vw,26px);
+    font-weight:900;letter-spacing:.06em;
+    color:var(--ink);margin-bottom:8px;position:relative;
+  }
+  .src{
+    font-size:12px;color:var(--muted);line-height:1.7;margin:14px 0 0;position:relative;
+  }
+  .src b{color:var(--pink-deep);font-weight:600}
+  .legend{
+    display:grid;grid-template-columns:1fr;gap:9px;
+    margin:22px 0 4px;text-align:left;position:relative;
+  }
+  .legend-item{
+    display:flex;align-items:center;gap:11px;
+    padding:12px 14px;border-radius:14px;
+    background:#fbf8fe;border:1px solid var(--line);
+    font-size:14px;
+  }
+  .badge{
+    flex:0 0 auto;width:26px;height:26px;border-radius:50%;
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;
+  }
+  .b1{background:var(--c1)} .b2{background:var(--c2)} .b3{background:var(--c3)}
+  .btn{
+    appearance:none;border:0;cursor:pointer;font-family:inherit;
+    font-size:16px;font-weight:700;border-radius:16px;
+    padding:16px 22px;transition:transform .12s ease,box-shadow .12s ease,background .12s;
+  }
+  .btn:active{transform:scale(.975)}
+  .btn-primary{
+    width:100%;margin-top:22px;
+    background:linear-gradient(180deg,#a97fd6,#7a4aa8);
+    color:#fff;
+    box-shadow:0 12px 24px -10px rgba(122,74,168,.66);
+  }
+  .btn-primary:hover{box-shadow:0 14px 28px -10px rgba(122,74,168,.8)}
+  .meta-row{
+    display:flex;justify-content:center;gap:16px;
+    font-size:12px;color:var(--muted);margin-top:14px;position:relative;
+  }
+
+  /* ---------- 答题 ---------- */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;padding:0 4px;
+  }
+  .counter{font-size:13px;font-weight:700;color:var(--pink-deep);letter-spacing:.04em}
+  .counter small{color:var(--muted);font-weight:500}
+  .progress-track{
+    height:6px;border-radius:99px;background:#e9e1f4;overflow:hidden;margin-bottom:20px;
+  }
+  .progress-fill{
+    height:100%;width:0%;border-radius:99px;
+    background:linear-gradient(90deg,#b98adf,#8e6bb8);
+    transition:width .3s cubic-bezier(.4,0,.2,1);
+  }
+  .q-card{
+    background:var(--card);border-radius:24px;padding:28px 24px 24px;
+    box-shadow:0 16px 40px -20px rgba(80,50,110,.3);
+    border:1px solid #efe6f8;
+  }
+  .q-no{
+    font-size:13px;font-weight:800;color:#cfa8e6;letter-spacing:.12em;margin-bottom:10px;
+  }
+  .q-text{
+    font-size:clamp(20px,5.2vw,25px);
+    line-height:1.55;font-weight:700;margin:0 0 26px;min-height:2.2em;
+  }
+  .options{display:flex;flex-direction:column;gap:11px}
+  .opt{
+    display:flex;align-items:center;gap:14px;width:100%;
+    background:#fff;border:2px solid #eae1f5;border-radius:16px;
+    padding:15px 16px;cursor:pointer;text-align:left;
+    font-family:inherit;font-size:16px;font-weight:600;color:var(--ink);
+    transition:all .15s ease;
+  }
+  .opt:hover{border-color:#d3b3e9;background:#fbf8fe;transform:translateY(-1px)}
+  .opt.picked{transform:scale(.99)}
+  .opt.picked[data-v="1"]{border-color:var(--c1);background:#f6f1fb}
+  .opt.picked[data-v="2"]{border-color:var(--c2);background:#fbf7ee}
+  .opt.picked[data-v="3"]{border-color:var(--c3);background:#f1f7f3}
+  .opt .badge{width:28px;height:28px;font-size:14px}
+  .opt .hint-sm{margin-left:auto;font-size:11px;color:#b9afc7;font-weight:500}
+  .nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+  .btn-ghost{
+    background:transparent;color:var(--muted);font-size:14px;font-weight:600;
+    padding:10px 14px;border-radius:12px;
+  }
+  .btn-ghost:hover{background:#f5effb;color:var(--pink-deep)}
+  .btn-ghost:disabled{opacity:.3;cursor:default;background:transparent;color:var(--muted)}
+  .kbd-tip{font-size:11px;color:#b9afc7}
+  .btn-map{
+    font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;
+    padding:8px 14px;border-radius:999px;border:1.5px solid #ddc6f0;background:#fff;
+    color:var(--pink-deep);transition:all .12s;
+  }
+  .btn-map:hover{background:#f7f1fc;border-color:#c49ade}
+  .map-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:16px}
+  .map-cell{
+    aspect-ratio:1;border-radius:10px;border:1.5px solid #e9e1f4;background:#fff;
+    font-family:inherit;font-size:12px;font-weight:700;color:#a99fba;cursor:pointer;
+    display:grid;place-items:center;transition:all .12s;padding:0;
+  }
+  .map-cell:hover{border-color:#cfa8e6;transform:translateY(-1px)}
+  .map-cell.v1{background:#f0e8f9;border-color:#c9a3d9;color:#8e3b5e}
+  .map-cell.v2{background:#faf5ea;border-color:#dbc08f;color:#a87314}
+  .map-cell.v3{background:#eff6f2;border-color:#a8cfc0;color:#2f6b56}
+  .map-cell.cur{outline:2.5px solid var(--pink);outline-offset:2px}
+
+  /* ---------- 结果 ---------- */
+  .res-card{
+    background:var(--card);border-radius:24px;padding:26px 22px;
+    box-shadow:0 16px 40px -20px rgba(80,50,110,.3);
+    border:1px solid #efe6f8;
+  }
+  .res-head{text-align:center;padding-bottom:20px;border-bottom:1px dashed var(--line)}
+  .score-line{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:10px 0 2px}
+  #score-num{font-size:58px;font-weight:900;color:var(--pink);line-height:1;letter-spacing:-.03em}
+  .score-unit{font-size:16px;font-weight:700;color:var(--pink-deep)}
+  .score-sub{font-size:13px;color:var(--muted)}
+  .type-badge{
+    display:inline-block;margin-top:14px;padding:7px 18px;border-radius:999px;
+    background:linear-gradient(180deg,#a97fd6,#7a4aa8);color:#fff;
+    font-weight:800;font-size:15px;letter-spacing:.04em;
+    box-shadow:0 8px 18px -8px rgba(122,74,168,.66);
+  }
+  .type-desc{font-size:14px;line-height:1.75;color:#4a4059;margin:14px auto 0;max-width:44ch}
+
+  .dist{margin:20px 0 6px;display:flex;flex-direction:column;gap:10px}
+  .dist-row{display:flex;align-items:center;gap:10px;font-size:13px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .d1{background:var(--c1)} .d2{background:var(--c2)} .d3{background:var(--c3)}
+  .dist-label{width:96px;flex:0 0 auto;color:#554a66;font-weight:600}
+  .dist-bar{flex:1;height:9px;border-radius:99px;background:#f1eaf8;overflow:hidden}
+  .dist-bar i{display:block;height:100%;width:0;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+  #bar1{background:var(--c1)} #bar2{background:var(--c2)} #bar3{background:var(--c3)}
+  .dist-count{width:28px;text-align:right;font-weight:800;color:#554a66;flex:0 0 auto}
+
+  .lists{display:grid;grid-template-columns:1fr;gap:14px;margin-top:20px}
+  @media(min-width:560px){.lists{grid-template-columns:1fr 1fr}}
+  .list-block{background:#fbf8fe;border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+  .list-block h3{
+    font-size:13px;margin:0 0 10px;color:var(--pink-deep);letter-spacing:.06em;
+    display:flex;align-items:center;gap:7px;
+  }
+  .list-block ol{margin:0;padding-left:0;list-style:none;font-size:12.5px;line-height:1.6;color:#4a4059}
+  .list-block li{padding:5px 0;border-bottom:1px dashed #f0e9f8;display:flex;gap:8px}
+  .list-block li:last-child{border-bottom:0}
+  .list-block li .n{color:#c0b4cf;font-weight:700;flex:0 0 20px}
+  .empty{color:#b9afc7;font-size:12.5px;font-style:normal}
+
+  .reflect{margin-top:22px;padding:18px;border-radius:18px;background:linear-gradient(180deg,#f7f1fc,#fbf8fe);border:1px solid #ecdef8}
+  .reflect h3{margin:0 0 8px;font-size:14px;color:var(--pink-deep)}
+  .reflect p{margin:0;font-size:14px;line-height:1.7;color:#4a4059}
+  .reflect-btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .reflect-btns button{
+    font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;
+    padding:10px 16px;border-radius:11px;border:1.5px solid #ddc6f0;background:#fff;color:var(--pink-deep);
+  }
+  .reflect-btns button.on{background:var(--pink);border-color:var(--pink);color:#fff}
+  .reflect-out{font-size:13px;color:#75597f;margin-top:12px;min-height:1em}
+
+  .compare{margin-top:22px;padding-top:20px;border-top:1px dashed var(--line)}
+  .compare h3{margin:0 0 6px;font-size:14px;color:var(--pink-deep)}
+  .compare .hint{margin:0 0 12px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .code-box{
+    display:flex;align-items:center;gap:8px;background:#fbf8fe;border:1px dashed #ddd0ef;
+    border-radius:12px;padding:10px 12px;margin-bottom:12px;
+  }
+  .code-box code{flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.1em;color:#86528f;word-break:break-all;white-space:pre-line;line-height:1.75}
+  .code-box button{font-size:11.5px;padding:7px 12px;border-radius:9px;border:1.5px solid #ddc6f0;background:#fff;color:var(--pink-deep);font-weight:700;cursor:pointer;font-family:inherit}
+  #code-input{
+    width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;letter-spacing:.12em;
+    padding:13px 14px;border-radius:12px;border:1.5px solid #e8e0f3;background:#fff;color:var(--ink);
+    outline:none;margin-bottom:10px;
+  }
+  #code-input:focus{border-color:#cfa8e6;box-shadow:0 0 0 3px #ebe0f6}
+  .compare-actions{display:flex;gap:8px}
+  .btn-sm{
+    font-size:13.5px;font-weight:700;padding:11px 18px;border-radius:11px;cursor:pointer;font-family:inherit;
+    border:0;background:linear-gradient(180deg,#a97fd6,#7a4aa8);color:#fff;
+  }
+  .btn-sm.ghost{background:#fff;border:1.5px solid #e8e0f3;color:#554a66}
+  #compare-out{margin-top:14px;font-size:13px;line-height:1.7}
+  .diff-item{padding:9px 0;border-bottom:1px dashed #f0e9f8;font-size:12.5px;color:#4a4059}
+  .diff-item:last-child{border-bottom:0}
+  .diff-item b{color:#6f5488}
+  .diff-tags{margin-top:4px;color:#988dab;font-size:11.5px}
+
+  .actions{display:flex;gap:10px;margin-top:22px}
+  .actions .btn{flex:1;font-size:13.5px;padding:15px 8px}
+  .btn-secondary{background:#fff;color:var(--pink-deep);border:2px solid #ddc6f0}
+  .btn-secondary:hover{background:#f8f3fd}
+
+  .foot{
+    text-align:center;font-size:11.5px;color:#b0a6bd;line-height:1.8;margin-top:26px;
+  }
+  .foot a{color:#c98aa8}
+
+  @media print{
+    body{background:#fff;padding:0}
+    .actions,.compare,.reflect-btns,.progress-track,.topbar,.btn-ghost{display:none!important}
+    .res-card{box-shadow:none;border:0}
+  }
+
+  /* ---------- 横屏两侧装饰（≥1400px 显示，录屏用） ---------- */
+  .wide-deco{display:none}
+  body[data-screen="result"],body[data-screen="map"]{align-items:flex-start}
+  body[data-screen="intro"] .wide-deco{display:none!important}
+  @media (min-width:1400px){
+    .app{max-width:780px}
+    .q-card{padding:38px 34px 32px;border-radius:28px}
+    .q-text{font-size:34px;line-height:1.5;margin-bottom:28px}
+    .q-no{font-size:15px;letter-spacing:.16em;margin-bottom:12px}
+    .opt{font-size:20px;padding:19px 20px;border-radius:20px;gap:16px}
+    .opt .badge{width:34px;height:34px;font-size:16px}
+    .opt .hint-sm{font-size:12px}
+    .options{gap:13px}
+    .counter{font-size:16px}
+    .progress-track{height:5px;border-radius:3px}
+    .topbar{margin-bottom:18px}
+    .nav-row{margin-top:20px}
+    .btn-ghost{font-size:15px}
+    .res-card{padding:34px 32px 30px;border-radius:28px}
+    #score-num{font-size:78px}
+    .score-unit{font-size:22px}
+    .score-sub{font-size:15px}
+    .type-badge{font-size:27px;padding:11px 30px}
+    .type-desc{font-size:15.5px;line-height:1.8;max-width:42ch}
+    .dist-row{font-size:14.5px}
+    .dist-label{width:112px}
+    .list-block h3{font-size:14px}
+    .list-block ol{font-size:14px}
+    .reflect h3,.compare h3{font-size:15px}
+    .reflect p,.compare .hint{font-size:14.5px}
+    .kicker{font-size:13px}
+    .title-sub{font-size:28px}
+    .legend-item{font-size:16px}
+    .intro-card{padding:42px 32px 32px}
+    .foot{font-size:13px;line-height:1.9}
+    .wide-deco{
+      display:flex;flex-direction:column;position:fixed;top:50%;transform:translateY(-50%);
+      pointer-events:none;z-index:0;
+    }
+    .wide-deco.left{left:max(52px,calc(50vw - 730px))}
+    .wide-deco.right{right:max(52px,calc(50vw - 730px));align-items:flex-end;text-align:right}
+    .wd-k{font-size:11px;font-weight:700;letter-spacing:.34em;color:#8e6bb8}
+    .wd-t{font-size:52px;font-weight:900;line-height:1.18;letter-spacing:.05em;color:#211c29;margin-top:18px}
+    .wd-s{font-size:14px;letter-spacing:.5em;color:#7d728a;margin-top:16px}
+    .wd-bar{display:flex;gap:4px;margin-top:28px}
+    .wd-bar i{display:block;width:26px;height:4px}
+    .wd-bar i:nth-child(1){background:#c2557a}
+    .wd-bar i:nth-child(2){background:#cf8b3c}
+    .wd-bar i:nth-child(3){background:#4d8a74}
+    .wd-n{font-family:"Bodoni MT",Georgia,serif;font-style:normal;font-weight:700;
+          font-family:"Cambria",Georgia,serif;
+          font-size:106px;line-height:.9;letter-spacing:-.02em;color:#3b2f52}
+    .wd-n em{font-family:-apple-system,"Microsoft YaHei",sans-serif;font-style:normal;
+             font-size:20px;font-weight:600;color:#b0a6bd;letter-spacing:.08em;margin-left:8px}
+    .wd-s2{font-size:11px;font-weight:700;letter-spacing:.34em;color:#8e6bb8;margin-top:14px}
+  }
+</style>
+</head>
+<body data-screen="intro">
+<div class="wide-deco left" aria-hidden="true">
+  <div class="wd-k">NO. 01 / 03</div>
+  <div class="wd-t">这算暧昧吗</div>
+  <div class="wd-s">判 定 表</div>
+  <div class="wd-bar"><i></i><i></i><i></i></div>
+</div>
+<div class="wide-deco right" aria-hidden="true">
+  <div class="wd-n"><span id="wide-num">01</span><em>/ 40</em></div>
+  <div class="wd-s2">SCENARIO</div>
+</div>
+
+<div class="app">
+
+  <!-- ========== 封面 ========== -->
+  <section id="screen-intro" class="screen active">
+    <div class="intro-card">
+      <span class="kicker">中文原创版 · 全 40 题</span>
+      <h1 class="title">这算暧昧吗？</h1>
+      <div class="title-sub">判 定 表</div>
+      <p class="src">
+        40 个具体场景 ｜ 关系边界判定 · 第 2 期 ｜ 开源版<br>
+        三档判定：<b>这就是暧昧</b> / <b>有点上头，但不算</b> / <b>纯友谊，没问题</b>
+      </p>
+
+      <div class="legend">
+        <div class="legend-item"><span class="badge b1">1</span>这就是暧昧</div>
+        <div class="legend-item"><span class="badge b2">2</span>有点上头，但不算</div>
+        <div class="legend-item"><span class="badge b3">3</span>纯友谊，没问题</div>
+      </div>
+
+      <button id="btn-start" class="btn btn-primary">开始判定</button>
+      <div class="meta-row"><span>40 题</span><span>约 3 分钟</span><span>可回看修改</span></div>
+    </div>
+    <p class="foot">
+      提示：这不是心理量表，没有标准答案。它是用来和恋人、朋友对答案的——同样是这件事，你俩的线可能根本不在一个位置。<br>
+      开源项目　·　代码 MIT　/　题目 CC BY-NC-SA 4.0
+    </p>
+  </section>
+
+  <!-- ========== 答题 ========== -->
+  <section id="screen-quiz" class="screen">
+    <div class="topbar">
+      <div class="counter"><span id="q-num">01</span><small> / 40</small></div>
+      <button id="btn-map" class="btn-map">答题卡</button>
+    </div>
+    <div class="progress-track"><div id="progress-fill" class="progress-fill"></div></div>
+
+    <div class="q-card">
+      <div class="q-no" id="q-no">QUESTION 01</div>
+      <h2 class="q-text" id="q-text">题目</h2>
+      <div class="options" id="options">
+        <button class="opt" data-v="1"><span class="badge b1">1</span><span>这就是暧昧</span><span class="hint-sm">1</span></button>
+        <button class="opt" data-v="2"><span class="badge b2">2</span><span>有点上头，但不算</span><span class="hint-sm">2</span></button>
+        <button class="opt" data-v="3"><span class="badge b3">3</span><span>纯友谊，没问题</span><span class="hint-sm">3</span></button>
+      </div>
+      <div class="nav-row">
+        <button id="btn-prev" class="btn btn-ghost">← 上一题</button>
+        <span class="kbd-tip">键盘 1 / 2 / 3 快选</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 结果 ========== -->
+  <section id="screen-result" class="screen">
+    <div class="res-card">
+      <div class="res-head">
+        <div class="kicker" style="font-size:11px">你的判定结果</div>
+        <div class="score-line"><span id="score-num">--</span><span class="score-unit">分</span></div>
+        <div class="score-sub">总分 <b id="score-total">--</b> / 120 · 宽容度 <b id="tol">--</b>%</div>
+        <div><span id="type-badge" class="type-badge">--</span></div>
+        <p id="type-desc" class="type-desc"></p>
+      </div>
+
+      <div class="dist">
+        <div class="dist-row"><span class="dot d1"></span><span class="dist-label">这就是暧昧</span><div class="dist-bar"><i id="bar1"></i></div><span id="c1" class="dist-count">0</span></div>
+        <div class="dist-row"><span class="dot d2"></span><span class="dist-label">有点上头</span><div class="dist-bar"><i id="bar2"></i></div><span id="c2" class="dist-count">0</span></div>
+        <div class="dist-row"><span class="dot d3"></span><span class="dist-label">纯友谊</span><div class="dist-bar"><i id="bar3"></i></div><span id="c3" class="dist-count">0</span></div>
+      </div>
+
+      <div class="lists">
+        <div class="list-block">
+          <h3><span class="dot d1"></span>你判成暧昧的</h3>
+          <ol id="list-1"></ol>
+        </div>
+        <div class="list-block">
+          <h3><span class="dot d3"></span>你觉得纯友谊的</h3>
+          <ol id="list-3"></ol>
+        </div>
+      </div>
+
+      <div class="reflect">
+        <h3>最后再加一问</h3>
+        <p>如果换成是你自己这么做，答案会改变吗？</p>
+        <div class="reflect-btns">
+          <button data-r="yes">会变</button>
+          <button data-r="no">不会变</button>
+          <button data-r="unsure">不好说</button>
+        </div>
+        <p id="reflect-out" class="reflect-out"></p>
+      </div>
+
+      <div class="compare">
+        <h3>和对方对一下</h3>
+        <p class="hint">把上面这串结果码发给对方，让 TA 也做一遍；或者把 TA 的结果码粘进来，看你们在哪几题上分道扬镳。</p>
+        <div class="code-box">
+          <code id="my-code">----------------</code>
+          <button id="btn-copy-code">复制</button>
+        </div>
+        <input id="code-input" maxlength="60" placeholder="粘贴对方的 40 位结果码，如 1213321231..." />
+        <div class="compare-actions">
+          <button id="btn-compare" class="btn-sm">对比</button>
+          <button id="btn-clear" class="btn-sm ghost">清空</button>
+        </div>
+        <div id="compare-out"></div>
+      </div>
+
+      <div class="actions">
+        <button id="btn-copy" class="btn btn-primary" style="margin-top:0">复制结果</button>
+        <button id="btn-review" class="btn btn-secondary">回看</button>
+        <button id="btn-again" class="btn btn-secondary">重做</button>
+      </div>
+    </div>
+    <p class="foot">
+      这不是心理学量表，是给关系做的一次「对答案」。<br>
+      分数和类型都是本页为了好玩加的，只分三项、不计分——真正有用的是你和对方差在哪几题。
+    </p>
+  </section>
+
+  <!-- ========== 答题卡 ========== -->
+  <section id="screen-map" class="screen">
+    <div class="topbar">
+      <div class="counter">答题卡</div>
+      <button id="btn-map-back" class="btn-map">← 返回当前题</button>
+    </div>
+    <div class="q-card">
+      <div class="q-no">ANSWER SHEET</div>
+      <h2 style="font-size:21px;margin:0 0 6px">点题号可以跳回去改</h2>
+      <p style="font-size:13px;color:#7d728a;margin:0">已答 <b id="map-done" style="color:#6b3f96">0</b> / 40　·　颜色即你的选择</p>
+      <div class="map-grid" id="map-grid"></div>
+      <button id="btn-map-finish" class="btn btn-primary" style="margin-top:22px">看结果</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var QUESTIONS = [
+    "每天睡前互道晚安，连续一个月",
+    "TA 发朋友圈，你总是第一个点赞",
+    "聊天列表里，只有 TA 的备注是一个表情",
+    "收到 TA 的消息，你会立刻放下手里的事",
+    "群聊里，你只回 TA 一个人的话",
+    "TA 问「在干嘛」，你回了一大段",
+    "夜里十二点后还在聊，聊到其中一个人睡着",
+    "手机一响就去看，明知道大概率不是 TA",
+    "记得 TA 不吃香菜，咖啡三分糖",
+    "TA 换了头像，你三分钟内就发现并夸了",
+    "只跟 TA 讲那些没发朋友圈的事",
+    "TA 的语音，你会听第二遍",
+    "相册里存着 TA 的聊天截图",
+    "两个人吃饭，吃到店里打烊",
+    "下班绕远二十分钟，送 TA 回家",
+    "看电影座位挨着，中间没有扶手",
+    "TA 喝多了，你去接，还帮 TA 擦脸",
+    "TA 生病，你比 TA 自己还紧张，买药送粥",
+    "逛超市，买的东西装进同一个袋子",
+    "唱歌只点 TA 会唱的歌",
+    "一起旅行，住一间房、两张床",
+    "过马路时，TA 拉了一下你的手腕",
+    "合照时，TA 的手搭在你肩上",
+    "打一把伞，伞明显往 TA 那边偏",
+    "TA 靠在你肩上睡着，你一路没动",
+    "分别的时候抱了一下，比朋友久一点",
+    "TA 说冷，你把外套脱下来给 TA",
+    "TA 叫你「宝宝」，你没有纠正",
+    "介绍 TA 时说「我朋友」，但中间停了一下",
+    "TA 家里人以为你们在谈恋爱，你没解释",
+    "你们有个只有彼此听得懂的梗",
+    "TA 问「你有喜欢的人吗」，你说「你猜」",
+    "TA 说「要不我们凑合一下」，你笑着没接",
+    "和别人吵架，第一个想找的人是 TA",
+    "TA 临时放你鸽子，你说「没事」，然后难受了一整天",
+    "你们的聊天记录，你删过几段",
+    "你说「我不喜欢这个类型」，但 TA 一发消息就秒回",
+    "TA 问「我们算什么」，你说「别问这个」",
+    "你们约好「如果三十岁都还单身就在一起」",
+    "别人问你们什么关系，你们对视了一眼"
+  ];
+
+  var N = QUESTIONS.length;
+  var answers = new Array(N).fill(0);
+  var cur = 0;
+  var reflectChoice = "";
+
+  var $ = function(id){ return document.getElementById(id); };
+  var screens = {
+    intro: $("screen-intro"),
+    quiz: $("screen-quiz"),
+    map: $("screen-map"),
+    result: $("screen-result")
+  };
+  function show(name){
+    document.body.setAttribute("data-screen", name);
+    Object.keys(screens).forEach(function(k){
+      screens[k].classList.toggle("active", k === name);
+    });
+    window.scrollTo({top:0, behavior:"instant"});
+  }
+
+  /* ---------- 答题 ---------- */
+  function renderQuiz(){
+    var n = cur + 1;
+    $("q-num").textContent = String(n).padStart(2,"0");
+    var wn = document.getElementById("wide-num");
+    if(wn){ wn.textContent = String(n).padStart(2,"0"); }
+    $("q-no").textContent = "QUESTION " + String(n).padStart(2,"0");
+    $("q-text").textContent = QUESTIONS[cur];
+    var done = 0;
+    for(var d=0; d<N; d++){ if(answers[d] > 0) done++; }
+    $("progress-fill").style.width = (done / N * 100) + "%";
+    $("btn-prev").disabled = cur === 0;
+
+    var opts = $("options").children;
+    for(var i=0;i<opts.length;i++){
+      var v = Number(opts[i].getAttribute("data-v"));
+      opts[i].classList.toggle("picked", answers[cur] === v);
+    }
+  }
+
+  function pick(v){
+    answers[cur] = v;
+    var opts = $("options").children;
+    for(var i=0;i<opts.length;i++){
+      opts[i].classList.toggle("picked", Number(opts[i].getAttribute("data-v")) === v);
+    }
+    setTimeout(function(){
+      if(cur < N - 1){
+        cur++;
+        renderQuiz();
+      } else {
+        $("progress-fill").style.width = "100%";
+        showResult();
+      }
+    }, 190);
+  }
+
+  $("options").addEventListener("click", function(e){
+    var btn = e.target.closest(".opt");
+    if(!btn) return;
+    pick(Number(btn.getAttribute("data-v")));
+  });
+
+  $("btn-prev").addEventListener("click", function(){
+    if(cur > 0){ cur--; renderQuiz(); }
+  });
+
+  $("btn-start").addEventListener("click", function(){
+    cur = 0;
+    renderQuiz();
+    show("quiz");
+  });
+
+  /* ---------- 结果 ---------- */
+  function fmtCode(s){
+    var groups = s.match(/.{1,4}/g) || [];
+    var half = Math.ceil(groups.length / 2);
+    return groups.slice(0, half).join(" ") + "\n" + groups.slice(half).join(" ");
+  }
+
+  function tally(){
+    var c = {1:0,2:0,3:0};
+    answers.forEach(function(v){ c[v] = (c[v]||0) + 1; });
+    return c;
+  }
+
+  function typeOf(avg){
+    if(avg < 1.35) return {name:"雷达全开型", desc:"几乎每一题你都判成了暧昧。六十分贝的关系，你能听出一百分贝的动静。放在伴侣身上是安全感，放在朋友身上就是『你俩是不是有事』。"};
+    if(avg < 1.70) return {name:"一眼看穿型", desc:"大部分场景你都觉得不对。你在意的不是动作本身，而是『这事为什么只对 TA 做』——区别对待，比行为更刺眼。"};
+    if(avg < 2.05) return {name:"边界清晰型", desc:"你能分清『顺手』和『特意』。朋友之间的自然往来你不介意，但对『只对你一个人这样』很敏感。"};
+    if(avg < 2.40) return {name:"看场合型", desc:"一半一半。同一件事，白天和深夜、当众和私下、你在不在场，你给的答案完全不同——你判的是情境，不是行为。"};
+    if(avg < 2.75) return {name:"钝感型", desc:"你更看动机，不看形式。聊天、搭肩、送回家你都觉得正常，除非对方把话说破。这种钝感，有人叫信任，有人叫错过。"};
+    return {name:"纯友谊信徒型", desc:"几乎全选『纯友谊』。要么你身边真有这样的朋友，要么……你自己就是那个被怀疑的人。这两种情况，外人通常分不出来。"};
+  }
+
+  function fillList(id, nums){
+    var ol = $(id);
+    ol.innerHTML = "";
+    if(!nums.length){
+      ol.innerHTML = '<li class="empty">这一栏是空的</li>';
+      return;
+    }
+    nums.forEach(function(n){
+      var li = document.createElement("li");
+      var sp1 = document.createElement("span");
+      sp1.className = "n";
+      sp1.textContent = String(n).padStart(2,"0");
+      var sp2 = document.createElement("span");
+      sp2.textContent = QUESTIONS[n-1];
+      li.appendChild(sp1); li.appendChild(sp2);
+      ol.appendChild(li);
+    });
+  }
+
+  function showResult(){
+    var c = tally();
+    var total = c[1]*1 + c[2]*2 + c[3]*3;
+    var avg = total / N;
+    var tol = Math.round((total - N) / (N*2) * 100);
+    var t = typeOf(avg);
+
+    $("score-num").textContent = total;
+    $("score-total").textContent = total;
+    $("tol").textContent = tol;
+    $("type-badge").textContent = t.name;
+    $("type-desc").textContent = t.desc;
+
+    $("c1").textContent = c[1];
+    $("c2").textContent = c[2];
+    $("c3").textContent = c[3];
+    $("bar1").style.width = (c[1]/N*100) + "%";
+    $("bar2").style.width = (c[2]/N*100) + "%";
+    $("bar3").style.width = (c[3]/N*100) + "%";
+
+    var l1 = [], l3 = [];
+    answers.forEach(function(v,i){
+      if(v === 1) l1.push(i+1);
+      if(v === 3) l3.push(i+1);
+    });
+    fillList("list-1", l1);
+    fillList("list-3", l3);
+
+    $("my-code").textContent = fmtCode(answers.join(""));
+    $("compare-out").innerHTML = "";
+    $("code-input").value = "";
+    reflectChoice = "";
+    $("reflect-out").textContent = "";
+    Array.prototype.forEach.call(document.querySelectorAll(".reflect-btns button"), function(b){
+      b.classList.remove("on");
+    });
+
+    show("result");
+  }
+
+  /* ---------- 结果码复制 ---------- */
+  function copyText(text){
+    if(navigator.clipboard && window.isSecureContext){
+      return navigator.clipboard.writeText(text);
+    }
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  function flash(btn, text){
+    var old = btn.textContent;
+    btn.textContent = text;
+    setTimeout(function(){ btn.textContent = old; }, 1400);
+  }
+
+  $("btn-copy-code").addEventListener("click", function(){
+    copyText(answers.join("")).then(function(){ flash(this, "已复制"); }.bind(this));
+  });
+
+  $("btn-copy").addEventListener("click", function(){
+    var c = tally();
+    var total = c[1] + c[2]*2 + c[3]*3;
+    var t = typeOf(total / N).name;
+    var txt =
+      "【这算暧昧吗？判定表 · 我的结果】\n" +
+      "总分 " + total + " / 120　类型：" + t + "\n" +
+      "①这就是暧昧 " + c[1] + " 题　②有点上头 " + c[2] + " 题　③纯友谊 " + c[3] + " 题\n" +
+      "结果码：" + answers.join("");
+    copyText(txt).then(function(){ flash(this, "已复制"); }.bind(this));
+  });
+
+  /* ---------- 反思题 ---------- */
+  var reflectMap = {
+    yes: "会变——说明这把尺子是『对别人严、对自己宽』的双标尺。承认它不丢人，但值得想一想。",
+    no: "不会变——你这套标准对自己和对别人是同一把尺子。挺难得的。",
+    unsure: "不好说——大概率是真的没想过。换个位置重新过一遍这 40 题，答案可能比你以为的更不一样。"
+  };
+  document.querySelector(".reflect-btns").addEventListener("click", function(e){
+    var b = e.target.closest("button");
+    if(!b) return;
+    var r = b.getAttribute("data-r");
+    reflectChoice = r;
+    Array.prototype.forEach.call(this.children, function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    $("reflect-out").textContent = reflectMap[r] || "";
+  });
+
+  /* ---------- 对比 ---------- */
+  $("btn-compare").addEventListener("click", function(){
+    var raw = ($("code-input").value || "").replace(/[^1-3]/g, "");
+    var out = $("compare-out");
+    if(raw.length !== N){
+      out.innerHTML = '<span style="color:#c0392b">结果码需要正好 ' + N + ' 位数字（只能是 1 / 2 / 3），你现在有 ' + raw.length + ' 位。</span>';
+      return;
+    }
+    var mine = answers.join("");
+    var diffs = [];
+    for(var i=0;i<N;i++){
+      if(mine[i] !== raw[i]) diffs.push(i);
+    }
+    var myTotal = answers.reduce(function(a,b){return a+b;},0);
+    var theirTotal = 0;
+    for(var j=0;j<N;j++) theirTotal += Number(raw[j]);
+
+    var label = {1:"这就是暧昧", 2:"有点上头", 3:"纯友谊"};
+    var html = "";
+    html += '<div style="margin-bottom:10px;color:#554a66">你 <b>' + myTotal + '</b> 分　对方 <b>' + theirTotal + '</b> 分　' +
+            '分歧 <b>' + diffs.length + '</b> 题' +
+            (myTotal === theirTotal ? '　（总分一样，但细节未必）' : (myTotal < theirTotal ? '　→ 你更严' : '　→ 对方更严')) +
+            '</div>';
+    if(!diffs.length){
+      html += '<div style="color:#4d8a74;font-weight:600">40 题全一致。这种默契不多见。</div>';
+    } else {
+      diffs.forEach(function(i){
+        html += '<div class="diff-item"><b>' + String(i+1).padStart(2,"0") + '. ' + QUESTIONS[i] + '</b>' +
+                '<div class="diff-tags">你：' + label[mine[i]] + '　｜　对方：' + label[raw[i]] + '</div></div>';
+      });
+    }
+    out.innerHTML = html;
+  });
+
+  $("btn-clear").addEventListener("click", function(){
+    $("code-input").value = "";
+    $("compare-out").innerHTML = "";
+  });
+
+  /* ---------- 答题卡 ---------- */
+  function renderMap(){
+    var grid = $("map-grid");
+    grid.innerHTML = "";
+    var done = 0;
+    for(var i=0;i<N;i++){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "map-cell" + (answers[i] ? " v"+answers[i] : "") + (i === cur ? " cur" : "");
+      b.textContent = i + 1;
+      if(answers[i]) done++;
+      (function(idx){
+        b.addEventListener("click", function(){
+          cur = idx;
+          renderQuiz();
+          show("quiz");
+        });
+      })(i);
+      grid.appendChild(b);
+    }
+    $("map-done").textContent = done;
+    var fin = $("btn-map-finish");
+    fin.textContent = done < N ? ("去补剩下的 " + (N - done) + " 题") : "看结果";
+  }
+
+  $("btn-map").addEventListener("click", function(){ renderMap(); show("map"); });
+  $("btn-map-back").addEventListener("click", function(){ renderQuiz(); show("quiz"); });
+  $("btn-map-finish").addEventListener("click", function(){
+    var done = answers.filter(function(v){ return v > 0; }).length;
+    if(done < N){
+      for(var i=0;i<N;i++){ if(!answers[i]){ cur = i; break; } }
+      renderQuiz();
+      show("quiz");
+      return;
+    }
+    showResult();
+  });
+  $("btn-review").addEventListener("click", function(){ renderMap(); show("map"); });
+
+  /* ---------- 重做 ---------- */
+  $("btn-again").addEventListener("click", function(){
+    answers = new Array(N).fill(0);
+    cur = 0;
+    reflectChoice = "";
+    show("intro");
+  });
+
+  /* ---------- 键盘 ---------- */
+  document.addEventListener("keydown", function(e){
+    if(!screens.quiz.classList.contains("active")) return;
+    if(e.key === "1" || e.key === "2" || e.key === "3"){
+      pick(Number(e.key));
+    } else if(e.key === "ArrowLeft"){
+      if(cur > 0){ cur--; renderQuiz(); }
+    }
+  });
+
+  renderQuiz();
+})();
+</script>
+</body>
+</html>
